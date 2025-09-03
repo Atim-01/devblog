@@ -1,87 +1,162 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { ApiResponse, ApiError } from '@/types';
+// API base configuration
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-// Create axios instance with default configuration
-const api: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
-  timeout: 10000,
-  headers: {
+// Common HTTP headers
+const getHeaders = (includeAuth = false) => {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-  },
-});
+  };
 
-// Request interceptor to add auth token
-api.interceptors.request.use(
-  (config) => {
-    // Get token from cookies or localStorage
-    const token = getAuthToken();
+  if (includeAuth) {
+    const token = localStorage.getItem('authToken');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      headers.Authorization = `Bearer ${token}`;
     }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
   }
-);
 
-// Response interceptor to handle common responses
-api.interceptors.response.use(
-  (response: AxiosResponse<ApiResponse<any>>) => {
-    return response;
-  },
-  (error) => {
-    // Handle common error cases
-    if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
-      clearAuthToken();
-      window.location.href = '/login';
+  return headers;
+};
+
+// Generic API request function
+const apiRequest = async <T>(
+  endpoint: string,
+  options: RequestInit = {},
+  includeAuth = false
+): Promise<T> => {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const headers = getHeaders(includeAuth);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...headers,
+        ...options.headers,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
-    return Promise.reject(error);
+
+    // Handle empty responses
+    if (response.status === 204) {
+      return {} as T;
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(`API request failed for ${endpoint}:`, error);
+    throw error;
   }
-);
-
-// Auth token management
-export const getAuthToken = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('auth_token') || null;
 };
 
-export const setAuthToken = (token: string): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem('auth_token', token);
+// Posts API
+export const postsApi = {
+  // Get all posts (public)
+  getAll: () => apiRequest<Post[]>('/posts'),
+  
+  // Get single post by ID (public)
+  getById: (id: string) => apiRequest<Post>(`/posts/${id}`),
+  
+  // Create new post (authenticated)
+  create: (data: CreatePostData) => 
+    apiRequest<Post>('/posts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }, true),
+  
+  // Update post (authenticated)
+  update: (id: string, data: UpdatePostData) => 
+    apiRequest<Post>(`/posts/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }, true),
+  
+  // Delete post (authenticated)
+  delete: (id: string) => 
+    apiRequest<void>(`/posts/${id}`, {
+      method: 'DELETE',
+    }, true),
 };
 
-export const clearAuthToken = (): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem('auth_token');
+// Users API
+export const usersApi = {
+  // Get current user profile (authenticated)
+  getProfile: () => apiRequest<User>('/users/profile', {}, true),
+  
+  // Update user profile (authenticated)
+  updateProfile: (data: UpdateUserData) => 
+    apiRequest<User>('/users/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }, true),
 };
 
-// Generic API functions
-export const apiGet = async <T>(url: string): Promise<ApiResponse<T>> => {
-  const response = await api.get<ApiResponse<T>>(url);
-  return response.data;
-};
+// Types
+export interface Post {
+  id: string;
+  title: string;
+  content: string;
+  authorId: string;
+  author?: {
+    id: string;
+    username: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
 
-export const apiPost = async <T>(url: string, data?: any): Promise<ApiResponse<T>> => {
-  const response = await api.post<ApiResponse<T>>(url, data);
-  return response.data;
-};
+export interface CreatePostData {
+  title: string;
+  content: string;
+}
 
-export const apiPut = async <T>(url: string, data?: any): Promise<ApiResponse<T>> => {
-  const response = await api.put<ApiResponse<T>>(url, data);
-  return response.data;
-};
+export interface UpdatePostData {
+  title?: string;
+  content?: string;
+}
 
-export const apiPatch = async <T>(url: string, data?: any): Promise<ApiResponse<T>> => {
-  const response = await api.patch<ApiResponse<T>>(url, data);
-  return response.data;
-};
+export interface User {
+  id: string;
+  username: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
-export const apiDelete = async <T>(url: string): Promise<ApiResponse<T>> => {
-  const response = await api.delete<ApiResponse<T>>(url);
-  return response.data;
-};
+export interface UpdateUserData {
+  username?: string;
+}
 
-// Export the configured axios instance
-export default api;
+// Error handling utilities
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public status?: number,
+    public code?: string
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+// Response wrapper for consistent API responses
+export interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  success: boolean;
+}
+
+// Utility function to handle API errors
+export const handleApiError = (error: unknown): string => {
+  if (error instanceof ApiError) {
+    return error.message;
+  }
+  
+  if (error instanceof Error) {
+    return error.message;
+  }
+  
+  return 'An unexpected error occurred';
+};
