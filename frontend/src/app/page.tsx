@@ -1,42 +1,32 @@
+'use client';
+
 import Link from 'next/link';
-import { postsApi, Post } from '@/lib/api';
+import { useState, useEffect } from 'react';
+import { postsApi, Post, ApiError, handleApiError } from '@/lib/api';
 import PostList from '@/components/blog/PostList';
 
-// Mock data for development (remove when backend is ready)
-const mockPosts: Post[] = [
-  {
-    id: '1',
-    title: 'Getting Started with Next.js 14',
-    content: 'Next.js 14 introduces the new App Router, Server Components, and many other exciting features...',
-    authorId: '1',
-    author: { id: '1', username: 'johndoe' },
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-15T10:00:00Z',
-  },
-  {
-    id: '2',
-    title: 'Building Scalable APIs with NestJS',
-    content: 'NestJS provides a robust framework for building scalable and maintainable server-side applications...',
-    authorId: '2',
-    author: { id: '2', username: 'janedoe' },
-    createdAt: '2024-01-14T15:30:00Z',
-    updatedAt: '2024-01-14T15:30:00Z',
-  },
-  {
-    id: '3',
-    title: 'Mastering TypeScript for Production',
-    content: 'TypeScript has become the standard for building large-scale JavaScript applications...',
-    authorId: '1',
-    author: { id: '1', username: 'johndoe' },
-    createdAt: '2024-01-13T09:15:00Z',
-    updatedAt: '2024-01-13T09:15:00Z',
-  },
-];
+export default function HomePage() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export default async function HomePage() {
-  // TODO: Replace with actual API call when backend is ready
-  // const posts = await postsApi.getAll();
-  const posts = mockPosts;
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const fetchedPosts = await postsApi.getAll();
+        setPosts(fetchedPosts);
+      } catch (err) {
+        console.error('Failed to fetch posts:', err);
+        setError(handleApiError(err));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -84,11 +74,52 @@ export default async function HomePage() {
           </p>
         </div>
 
-        <PostList 
-          posts={posts} 
-          showActions={false}
-          emptyMessage="Be the first to share your knowledge!"
-        />
+        {/* Loading State */}
+        {isLoading && (
+          <div className="text-center py-12">
+            <div className="inline-flex items-center px-4 py-2 font-semibold leading-6 text-primary-600 transition ease-in-out duration-150">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Loading posts...
+            </div>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !isLoading && (
+          <div className="text-center py-12">
+            <div className="bg-red-50 border border-red-200 rounded-md p-6 max-w-md mx-auto">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">Failed to load posts</h3>
+                  <p className="mt-2 text-sm text-red-700">{error}</p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="mt-3 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  >
+                    Try again
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Posts List */}
+        {!isLoading && !error && (
+          <PostList 
+            posts={posts} 
+            showActions={false}
+            emptyMessage="Be the first to share your knowledge!"
+          />
+        )}
 
         {/* Call to Action */}
         <div className="mt-16 text-center">

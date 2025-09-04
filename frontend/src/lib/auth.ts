@@ -10,7 +10,7 @@ const AUTH_ENDPOINTS = {
 } as const;
 
 // API base configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 // Authentication response types
 export interface LoginRequest {
@@ -83,14 +83,14 @@ export const authApi = {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new ApiError(
-          errorData.message || 'Login failed',
-          response.status,
-          errorData.code
-        );
+        const errorMessage = errorData.message || errorData.details?.validationErrors?.[0] || 'Login failed';
+        throw new ApiError(errorMessage, response.status);
       }
 
-      const data: AuthResponse = await response.json();
+      const responseData = await response.json();
+      
+      // Handle NestJS response format: { data: T, message: string, success: boolean }
+      const data: AuthResponse = responseData.data || responseData;
       
       // Store tokens
       setAuthToken(data.accessToken);
@@ -118,14 +118,14 @@ export const authApi = {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new ApiError(
-          errorData.message || 'Registration failed',
-          response.status,
-          errorData.code
-        );
+        const errorMessage = errorData.message || errorData.details?.validationErrors?.[0] || 'Registration failed';
+        throw new ApiError(errorMessage, response.status);
       }
 
-      const data: AuthResponse = await response.json();
+      const responseData = await response.json();
+      
+      // Handle NestJS response format: { data: T, message: string, success: boolean }
+      const data: AuthResponse = responseData.data || responseData;
       
       // Store tokens
       setAuthToken(data.accessToken);
@@ -163,14 +163,14 @@ export const authApi = {
         }
         
         const errorData = await response.json().catch(() => ({}));
-        throw new ApiError(
-          errorData.message || 'Failed to get user profile',
-          response.status,
-          errorData.code
-        );
+        const errorMessage = errorData.message || 'Failed to get user profile';
+        throw new ApiError(errorMessage, response.status);
       }
 
-      return await response.json();
+      const responseData = await response.json();
+      
+      // Handle NestJS response format: { data: T, message: string, success: boolean }
+      return responseData.data || responseData;
     } catch (error) {
       console.error('Get profile API call failed:', error);
       throw error;
@@ -195,14 +195,12 @@ export const authApi = {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new ApiError(
-          errorData.message || 'Token refresh failed',
-          response.status,
-          errorData.code
-        );
+        const errorMessage = errorData.message || 'Token refresh failed';
+        throw new ApiError(errorMessage, response.status);
       }
 
-      const data: { accessToken: string } = await response.json();
+      const responseData = await response.json();
+      const data: { accessToken: string } = responseData.data || responseData;
       setAuthToken(data.accessToken);
       return data;
     } catch (error) {
@@ -248,66 +246,4 @@ export const getAuthHeaders = (): Record<string, string> => {
     'Content-Type': 'application/json',
     ...(token && { 'Authorization': `Bearer ${token}` }),
   };
-};
-
-// Mock authentication for development (remove when backend is ready)
-export const mockAuth = {
-  login: async (credentials: LoginRequest): Promise<AuthResponse> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Mock successful login
-    const mockResponse: AuthResponse = {
-      user: {
-        id: '1',
-        username: credentials.username,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      accessToken: 'mock-access-token',
-      refreshToken: 'mock-refresh-token',
-    };
-
-    setAuthToken(mockResponse.accessToken);
-    setRefreshToken(mockResponse.refreshToken);
-    
-    return mockResponse;
-  },
-
-  register: async (userData: RegisterRequest): Promise<AuthResponse> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Mock successful registration
-    const mockResponse: AuthResponse = {
-      user: {
-        id: '1',
-        username: userData.username,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      accessToken: 'mock-access-token',
-      refreshToken: 'mock-refresh-token',
-    };
-
-    setAuthToken(mockResponse.accessToken);
-    setRefreshToken(mockResponse.refreshToken);
-    
-    return mockResponse;
-  },
-
-  getProfile: async (): Promise<UserProfile> => {
-    const token = getAuthToken();
-    if (!token) {
-      throw new ApiError('No authentication token found', 401);
-    }
-
-    // Mock user profile
-    return {
-      id: '1',
-      username: 'mockuser',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-  },
 };

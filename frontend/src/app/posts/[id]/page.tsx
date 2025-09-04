@@ -1,198 +1,11 @@
+'use client';
+
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { postsApi, Post } from '@/lib/api';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { postsApi, Post, ApiError, handleApiError } from '@/lib/api';
+import { useAuth } from '@/hooks/useAuth';
 import PostView from '@/components/blog/PostView';
-
-// Mock data for development (remove when backend is ready)
-const mockPosts: Record<string, Post> = {
-  '1': {
-    id: '1',
-    title: 'Getting Started with Next.js 14',
-    content: `Next.js 14 introduces the new App Router, Server Components, and many other exciting features that revolutionize how we build React applications.
-
-## What's New in Next.js 14?
-
-The App Router is the biggest change in Next.js 14. It introduces a new file-system based router that makes it easier to create complex layouts and nested routes. With the App Router, you can:
-
-- Create nested layouts that share UI between routes
-- Use Server Components by default for better performance
-- Implement streaming for faster page loads
-- Use the new loading.js and error.js files for better UX
-
-## Server Components
-
-Server Components are React components that run on the server and can access backend resources directly. This means:
-
-- No need to fetch data on the client
-- Smaller JavaScript bundles
-- Better SEO and performance
-- Direct access to databases and APIs
-
-## Getting Started
-
-To get started with Next.js 14, you can create a new project using:
-
-\`\`\`bash
-npx create-next-app@latest my-app --app
-\`\`\`
-
-This will create a new Next.js project with the App Router enabled by default.
-
-## Key Benefits
-
-- **Performance**: Better performance with Server Components
-- **Developer Experience**: Improved DX with the new router
-- **SEO**: Better SEO with server-side rendering
-- **Scalability**: More scalable architecture for large applications
-
-Next.js 14 represents a significant step forward in the React ecosystem, making it easier than ever to build fast, scalable web applications.`,
-    authorId: '1',
-    author: { id: '1', username: 'johndoe' },
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-15T10:00:00Z',
-  },
-  '2': {
-    id: '2',
-    title: 'Building Scalable APIs with NestJS',
-    content: `NestJS provides a robust framework for building scalable and maintainable server-side applications. It combines the best practices from object-oriented programming, functional programming, and functional reactive programming.
-
-## Why Choose NestJS?
-
-NestJS offers several advantages over other Node.js frameworks:
-
-- **TypeScript First**: Built with TypeScript from the ground up
-- **Modular Architecture**: Easy to organize code into modules
-- **Dependency Injection**: Built-in DI container for better testability
-- **Decorators**: Use decorators for clean, readable code
-- **OpenAPI Support**: Automatic API documentation generation
-
-## Core Concepts
-
-### Modules
-Modules are the basic building blocks of NestJS applications. They help organize related functionality:
-
-\`\`\`typescript
-@Module({
-  imports: [DatabaseModule],
-  controllers: [UserController],
-  providers: [UserService],
-  exports: [UserService],
-})
-export class UserModule {}
-\`\`\`
-
-### Controllers
-Controllers handle incoming requests and return responses:
-
-\`\`\`typescript
-@Controller('users')
-export class UserController {
-  @Get()
-  findAll(): User[] {
-    return this.userService.findAll();
-  }
-}
-\`\`\`
-
-### Services
-Services contain business logic and can be injected into controllers:
-
-\`\`\`typescript
-@Injectable()
-export class UserService {
-  findAll(): User[] {
-    return this.users;
-  }
-}
-\`\`\`
-
-## Getting Started
-
-To create a new NestJS project:
-
-\`\`\`bash
-npm i -g @nestjs/cli
-nest new project-name
-\`\`\`
-
-NestJS provides a solid foundation for building enterprise-grade applications with Node.js.`,
-    authorId: '2',
-    author: { id: '2', username: 'janedoe' },
-    createdAt: '2024-01-14T15:30:00Z',
-    updatedAt: '2024-01-14T15:30:00Z',
-  },
-  '3': {
-    id: '3',
-    title: 'Mastering TypeScript for Production',
-    content: `TypeScript has become the standard for building large-scale JavaScript applications. It provides static typing, better tooling, and improved developer experience.
-
-## TypeScript Benefits
-
-- **Static Typing**: Catch errors at compile time
-- **Better IDE Support**: Enhanced autocomplete and refactoring
-- **Improved Maintainability**: Easier to maintain large codebases
-- **Team Collaboration**: Better code documentation through types
-
-## Advanced Features
-
-### Generics
-Generics allow you to create reusable components:
-
-\`\`\`typescript
-function identity<T>(arg: T): T {
-  return arg;
-}
-
-const output = identity<string>("myString");
-\`\`\`
-
-### Union Types
-Union types allow a value to be one of several types:
-
-\`\`\`typescript
-type Status = "loading" | "success" | "error";
-
-function handleStatus(status: Status) {
-  switch (status) {
-    case "loading":
-      return "Please wait...";
-    case "success":
-      return "Operation completed!";
-    case "error":
-      return "Something went wrong.";
-  }
-}
-\`\`\`
-
-### Utility Types
-TypeScript provides many utility types:
-
-\`\`\`typescript
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
-
-type PartialUser = Partial<User>; // All properties optional
-type UserKeys = keyof User; // "id" | "name" | "email"
-\`\`\`
-
-## Best Practices
-
-1. **Use strict mode**: Enable strict TypeScript configuration
-2. **Define interfaces**: Create clear contracts for your data
-3. **Avoid any**: Use proper types instead of any
-4. **Use enums sparingly**: Prefer union types for simple cases
-5. **Leverage utility types**: Use built-in utility types when possible
-
-TypeScript is an essential tool for modern JavaScript development, providing the safety and tooling needed for production applications.`,
-    authorId: '1',
-    author: { id: '1', username: 'johndoe' },
-    createdAt: '2024-01-13T09:15:00Z',
-    updatedAt: '2024-01-13T09:15:00Z',
-  },
-};
 
 interface PostPageProps {
   params: {
@@ -200,15 +13,111 @@ interface PostPageProps {
   };
 }
 
-export default async function PostPage({ params }: PostPageProps) {
+export default function PostPage({ params }: PostPageProps) {
   const { id } = params;
+  const [post, setPost] = useState<Post | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  const { isAuthenticated, user } = useAuth();
+  const router = useRouter();
 
-  // TODO: Replace with actual API call when backend is ready
-  // const post = await postsApi.getById(id);
-  const post = mockPosts[id];
+  const isOwner = post?.authorId === user?.id;
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const fetchedPost = await postsApi.getById(id);
+        setPost(fetchedPost);
+      } catch (err) {
+        console.error('Failed to fetch post:', err);
+        if (err instanceof ApiError && err.status === 404) {
+          setError('Post not found');
+        } else {
+          setError(handleApiError(err));
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [id]);
+
+  const handleDelete = async () => {
+    if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      await postsApi.delete(id);
+      router.push('/');
+    } catch (err) {
+      console.error('Failed to delete post:', err);
+      alert('Failed to delete post. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <svg className="animate-spin mx-auto h-12 w-12 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p className="mt-4 text-gray-600">Loading post...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="bg-red-50 border border-red-200 rounded-md p-6">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Error loading post</h3>
+                <p className="mt-2 text-sm text-red-700">{error}</p>
+                <div className="mt-4 flex space-x-3">
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  >
+                    Try again
+                  </button>
+                  <Link
+                    href="/"
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                  >
+                    Back to posts
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!post) {
-    notFound();
+    return null;
   }
 
   return (
@@ -224,23 +133,24 @@ export default async function PostPage({ params }: PostPageProps) {
               ← Back to posts
             </Link>
             
-            {/* TODO: Add edit/delete buttons for post owner */}
-            {/* {isOwner && (
+            {/* Edit/Delete buttons for post owner */}
+            {isAuthenticated && isOwner && (
               <div className="flex space-x-3">
                 <Link
                   href={`/posts/edit/${post.id}`}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   Edit
                 </Link>
                 <button
                   onClick={handleDelete}
-                  className="px-4 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 hover:bg-red-50"
+                  disabled={isDeleting}
+                  className="px-4 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Delete
+                  {isDeleting ? 'Deleting...' : 'Delete'}
                 </button>
               </div>
-            )} */}
+            )}
           </div>
         </div>
       </div>

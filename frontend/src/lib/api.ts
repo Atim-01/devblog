@@ -1,5 +1,5 @@
 // API base configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 // Common HTTP headers
 const getHeaders = (includeAuth = false) => {
@@ -37,15 +37,23 @@ const apiRequest = async <T>(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      const errorMessage = errorData.message || errorData.details?.validationErrors?.[0] || `HTTP error! status: ${response.status}`;
+      throw new ApiError(errorMessage, response.status);
     }
 
-    // Handle empty responses
+    // Handle empty responses (like DELETE operations)
     if (response.status === 204) {
       return {} as T;
     }
 
-    return await response.json();
+    const responseData = await response.json();
+    
+    // Handle NestJS response format: { data: T, message: string, success: boolean }
+    if (responseData.data !== undefined) {
+      return responseData.data;
+    }
+    
+    return responseData;
   } catch (error) {
     console.error(`API request failed for ${endpoint}:`, error);
     throw error;
@@ -59,6 +67,15 @@ export const postsApi = {
   
   // Get single post by ID (public)
   getById: (id: string) => apiRequest<Post>(`/posts/${id}`),
+  
+  // Search posts (public)
+  search: (query: string) => apiRequest<Post[]>(`/posts/search?q=${encodeURIComponent(query)}`),
+  
+  // Get posts by tag (public)
+  getByTag: (tag: string) => apiRequest<Post[]>(`/posts/tag/${encodeURIComponent(tag)}`),
+  
+  // Get posts by author (public)
+  getByAuthor: (authorId: string) => apiRequest<Post[]>(`/posts/author/${authorId}`),
   
   // Create new post (authenticated)
   create: (data: CreatePostData) => 
