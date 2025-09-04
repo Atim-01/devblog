@@ -6,6 +6,9 @@ import { cn } from '@/utils';
 interface CardProps {
   children: React.ReactNode;
   className?: string;
+  hover?: boolean;
+  interactive?: boolean;
+  onClick?: () => void;
 }
 
 interface CardHeaderProps {
@@ -23,9 +26,24 @@ interface CardFooterProps {
   className?: string;
 }
 
-const Card: React.FC<CardProps> = ({ children, className = '' }) => {
+const Card: React.FC<CardProps> = ({ 
+  children, 
+  className = '', 
+  hover = false, 
+  interactive = false,
+  onClick 
+}) => {
+  const baseClasses = 'bg-white rounded-lg shadow-soft border border-gray-200 transition-all duration-200';
+  const hoverClasses = hover ? 'hover:shadow-medium hover:-translate-y-0.5' : '';
+  const interactiveClasses = interactive ? 'cursor-pointer hover:shadow-medium hover:-translate-y-0.5 active:translate-y-0 active:shadow-soft' : '';
+  
   return (
-    <div className={cn('bg-white rounded-lg shadow-soft border border-gray-200', className)}>
+    <div 
+      className={cn(baseClasses, hoverClasses, interactiveClasses, className)}
+      onClick={onClick}
+      role={interactive ? 'button' : undefined}
+      tabIndex={interactive ? 0 : undefined}
+    >
       {children}
     </div>
   );
@@ -49,7 +67,7 @@ const CardBody: React.FC<CardBodyProps> = ({ children, className = '' }) => {
 
 const CardFooter: React.FC<CardFooterProps> = ({ children, className = '' }) => {
   return (
-    <div className={cn('px-6 py-4 border-t border-gray-200 bg-gray-50', className)}>
+    <div className={cn('px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-lg', className)}>
       {children}
     </div>
   );
