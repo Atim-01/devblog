@@ -1,6 +1,8 @@
 import { IsString, IsOptional, MinLength, MaxLength, Matches } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateUserDto {
+  @ApiPropertyOptional({ example: 'newusername' })
   @IsOptional()
   @IsString()
   @MinLength(3)
@@ -10,12 +12,10 @@ export class UpdateUserDto {
   })
   username?: string;
 
+  @ApiPropertyOptional({ example: 'newpassword123' })
   @IsOptional()
   @IsString()
   @MinLength(6)
   @MaxLength(100)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-    message: 'Password must contain at least one lowercase letter, one uppercase letter, and one number',
-  })
   password?: string;
 }

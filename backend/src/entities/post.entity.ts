@@ -44,13 +44,22 @@ export class Post {
 
   // Method to get post with author info
   toJSON() {
-    const obj = { ...this };
+    const serialized: any = {
+      id: this.id,
+      title: this.title,
+      content: this.content,
+      authorId: this.authorId,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    };
+
     if (this.author) {
-      obj.author = {
+      serialized.author = {
         id: this.author.id,
         username: this.author.username,
       };
     }
-    return obj;
+
+    return serialized;
   }
 }

@@ -37,7 +37,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       
       // Include validation errors if available
       if (responseObj.errors && Array.isArray(responseObj.errors)) {
-        details = responseObj.errors;
+        details = { validationErrors: responseObj.errors };
+      } else if (responseObj.message && Array.isArray(responseObj.message)) {
+        // Handle validation errors from class-validator
+        details = { validationErrors: responseObj.message };
       }
       
       // Include error property if available

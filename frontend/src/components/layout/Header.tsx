@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { isAuthenticated, clearUser } from '@/utils';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Header() {
   const router = useRouter();
-  const authenticated = isAuthenticated();
+  const { isAuthenticated, user, logout } = useAuth();
 
   const handleLogout = () => {
-    clearUser();
+    logout();
     router.push('/login');
   };
 
@@ -32,7 +32,7 @@ export default function Header() {
             >
               Home
             </Link>
-            {authenticated && (
+            {isAuthenticated && (
               <Link
                 href="/create-post"
                 className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
@@ -44,8 +44,18 @@ export default function Header() {
 
           {/* Auth Actions */}
           <div className="flex items-center space-x-4">
-            {authenticated ? (
+            {isAuthenticated && user ? (
               <>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                    <span className="text-primary-600 text-sm font-medium">
+                      {user.username.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <span className="text-sm text-gray-700 hidden sm:block">
+                    {user.username}
+                  </span>
+                </div>
                 <button
                   onClick={handleLogout}
                   className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"

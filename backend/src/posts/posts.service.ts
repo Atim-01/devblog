@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Post } from '../entities/post.entity';
@@ -115,6 +115,11 @@ export class PostsService {
     // Check if user is the author of the post
     if (post.authorId !== userId) {
       throw new ForbiddenException('You can only update your own posts');
+    }
+
+    // Validate that at least one field is provided
+    if (!updatePostDto.title && !updatePostDto.content) {
+      throw new BadRequestException('At least one field (title or content) must be provided');
     }
 
     // Update post
