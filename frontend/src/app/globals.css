@@ -11,53 +11,53 @@
   }
   
   body {
-    @apply text-gray-900 bg-gray-50;
+    @apply text-dark-charcoal bg-warm-gray;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold text-gray-900;
+    @apply font-semibold text-dark-charcoal;
   }
   
   h1 {
-    @apply text-4xl md:text-5xl;
+    @apply text-4xl md:text-5xl text-vivid-indigo;
   }
   
   h2 {
-    @apply text-3xl md:text-4xl;
+    @apply text-3xl md:text-4xl text-vivid-indigo;
   }
   
   h3 {
-    @apply text-2xl md:text-3xl;
+    @apply text-2xl md:text-3xl text-electric-blue;
   }
   
   h4 {
-    @apply text-xl md:text-2xl;
+    @apply text-xl md:text-2xl text-electric-blue;
   }
   
   h5 {
-    @apply text-lg md:text-xl;
+    @apply text-lg md:text-xl text-dark-charcoal;
   }
   
   h6 {
-    @apply text-base md:text-lg;
+    @apply text-base md:text-lg text-dark-charcoal;
   }
   
   p {
-    @apply text-gray-700 leading-relaxed;
+    @apply text-medium-gray leading-relaxed;
   }
   
   a {
-    @apply text-primary-600 hover:text-primary-700 transition-colors;
+    @apply text-vivid-indigo hover:text-electric-blue transition-colors;
   }
   
   code {
     font-family: 'JetBrains Mono', monospace;
-    @apply bg-gray-100 px-2 py-1 rounded text-sm;
+    @apply bg-soft-lavender px-2 py-1 rounded text-sm text-vivid-indigo;
   }
   
   pre {
     font-family: 'JetBrains Mono', monospace;
-    @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto;
+    @apply bg-dark-charcoal text-warm-gray p-4 rounded-lg overflow-x-auto;
   }
 }
 
@@ -67,23 +67,35 @@
   }
   
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+    @apply btn bg-vivid-indigo text-white hover:bg-primary-700 focus:ring-vivid-indigo;
   }
   
   .btn-secondary {
-    @apply btn bg-secondary-600 text-white hover:bg-secondary-700 focus:ring-secondary-500;
+    @apply btn bg-electric-blue text-white hover:bg-primary-700 focus:ring-electric-blue;
   }
   
   .btn-outline {
-    @apply btn border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-primary-500;
+    @apply btn border-medium-gray text-dark-charcoal bg-white hover:bg-soft-lavender focus:ring-vivid-indigo;
   }
   
   .btn-ghost {
-    @apply btn text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:ring-gray-500;
+    @apply btn text-medium-gray hover:text-dark-charcoal hover:bg-soft-lavender focus:ring-medium-gray;
   }
   
   .btn-danger {
-    @apply btn bg-error-600 text-white hover:bg-error-700 focus:ring-error-500;
+    @apply btn bg-crimson-red text-white hover:bg-error-700 focus:ring-crimson-red;
+  }
+  
+  .btn-success {
+    @apply btn bg-lime-green text-white hover:bg-success-600 focus:ring-lime-green;
+  }
+  
+  .btn-warning {
+    @apply btn bg-sunset-orange text-white hover:bg-warning-600 focus:ring-sunset-orange;
+  }
+  
+  .btn-teal {
+    @apply btn bg-teal text-white hover:bg-accent-600 focus:ring-teal;
   }
   
   .btn-sm {
@@ -95,19 +107,19 @@
   }
   
   .input {
-    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500;
+    @apply block w-full px-3 py-2 border border-medium-gray rounded-md shadow-sm placeholder-medium-gray focus:outline-none focus:ring-vivid-indigo focus:border-vivid-indigo bg-white;
   }
   
   .input-error {
-    @apply input border-error-300 focus:ring-error-500 focus:border-error-500;
+    @apply input border-crimson-red focus:ring-crimson-red focus:border-crimson-red;
   }
   
   .card {
-    @apply bg-white rounded-lg shadow-soft border border-gray-200;
+    @apply bg-white rounded-lg shadow-soft border border-soft-lavender;
   }
   
   .card-header {
-    @apply px-6 py-4 border-b border-gray-200;
+    @apply px-6 py-4 border-b border-soft-lavender;
   }
   
   .card-body {
@@ -115,7 +127,27 @@
   }
   
   .card-footer {
-    @apply px-6 py-4 border-t border-gray-200 bg-gray-50;
+    @apply px-6 py-4 border-t border-soft-lavender bg-warm-gray;
+  }
+  
+  .alert {
+    @apply p-4 rounded-lg border;
+  }
+  
+  .alert-success {
+    @apply alert bg-lime-green/10 border-lime-green/20 text-success-800;
+  }
+  
+  .alert-warning {
+    @apply alert bg-sunset-orange/10 border-sunset-orange/20 text-warning-800;
+  }
+  
+  .alert-error {
+    @apply alert bg-crimson-red/10 border-crimson-red/20 text-error-800;
+  }
+  
+  .alert-info {
+    @apply alert bg-teal/10 border-teal/20 text-accent-800;
   }
 }
 
@@ -197,7 +229,7 @@
   }
 
   .hover-glow:hover {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 20px rgba(0, 252, 250, 0.3);
   }
 
   /* Focus styles */
@@ -219,7 +251,14 @@
 
   /* Gradient text */
   .gradient-text {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #5B21B6 0%, #2563EB 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .gradient-text-teal {
+    background: linear-gradient(135deg, #14B8A6 0%, #22C55E 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

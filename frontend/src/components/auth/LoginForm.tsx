@@ -62,8 +62,8 @@ export default function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProp
     <Card className="max-w-md mx-auto">
       <CardHeader>
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <h1 className="text-2xl font-bold text-dark-charcoal">Welcome back</h1>
+          <p className="mt-2 text-sm text-medium-gray">
             Sign in to your account to continue
           </p>
         </div>
@@ -72,7 +72,7 @@ export default function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProp
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardBody className="space-y-4">
           {error && (
-            <div className="bg-error-50 border border-error-200 rounded-md p-3">
+            <div className="bg-crimson-red/10 border border-crimson-red/20 rounded-md p-3">
               <p className="text-sm text-error-600">{error}</p>
             </div>
           )}
@@ -108,11 +108,11 @@ export default function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProp
           </Button>
           
           <div className="text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-medium-gray">
               Don't have an account?{' '}
               <Link 
                 href="/register" 
-                className="text-primary-600 hover:text-primary-700 font-medium"
+                className="text-vivid-indigo hover:text-electric-blue font-medium"
               >
                 Sign up
               </Link>

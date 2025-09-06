@@ -101,17 +101,17 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
   };
 
   const iconClasses = {
-    success: 'text-success-500',
-    error: 'text-error-500',
-    warning: 'text-warning-500',
-    info: 'text-primary-500',
+    success: 'text-lime-green',
+    error: 'text-crimson-red',
+    warning: 'text-sunset-orange',
+    info: 'text-teal',
   };
 
   const bgClasses = {
-    success: 'bg-success-50 border-success-200',
-    error: 'bg-error-50 border-error-200',
-    warning: 'bg-warning-50 border-warning-200',
-    info: 'bg-primary-50 border-primary-200',
+    success: 'bg-lime-green/10 border-lime-green/20',
+    error: 'bg-crimson-red/10 border-crimson-red/20',
+    warning: 'bg-sunset-orange/10 border-sunset-orange/20',
+    info: 'bg-teal/10 border-teal/20',
   };
 
   const icons = {
@@ -133,17 +133,17 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
     >
       <Icon className={cn('h-5 w-5 flex-shrink-0 mt-0.5', iconClasses[toast.type])} />
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900">{toast.title}</p>
+        <p className="text-sm font-medium text-dark-charcoal">{toast.title}</p>
         {toast.message && (
-          <p className="text-sm text-gray-600 mt-1">{toast.message}</p>
+          <p className="text-sm text-medium-gray mt-1">{toast.message}</p>
         )}
       </div>
       <button
         onClick={handleRemove}
-        className="flex-shrink-0 p-1 rounded-md hover:bg-black/5 transition-colors"
+        className="flex-shrink-0 p-1 rounded-md hover:bg-soft-lavender transition-colors"
         aria-label="Dismiss notification"
       >
-        <X className="h-4 w-4 text-gray-400" />
+        <X className="h-4 w-4 text-medium-gray" />
       </button>
     </div>
   );

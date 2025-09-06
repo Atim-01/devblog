@@ -51,7 +51,7 @@ export default function PostCard({
     >
       <CardBody className="p-6">
         {/* Post Meta */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-500 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-medium-gray mb-4">
           <div className="flex items-center gap-2">
             <User className="h-4 w-4" />
             <span>By {post.author?.username}</span>
@@ -60,7 +60,7 @@ export default function PostCard({
             <Calendar className="h-4 w-4" />
             <span>{formatDate(post.createdAt)}</span>
             {post.updatedAt !== post.createdAt && (
-              <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
+              <span className="text-xs bg-soft-lavender px-2 py-1 rounded-full text-vivid-indigo">
                 Updated
               </span>
             )}
@@ -68,10 +68,10 @@ export default function PostCard({
         </div>
         
         {/* Post Title */}
-        <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors duration-200">
+        <h3 className="text-xl sm:text-2xl font-semibold text-dark-charcoal mb-3 group-hover:text-vivid-indigo transition-colors duration-200">
           <Link
             href={`/posts/${post.id}`}
-            className="hover:text-primary-600 transition-colors duration-200 block"
+            className="hover:text-vivid-indigo transition-colors duration-200 block"
           >
             <span className="block overflow-hidden" style={{ 
               display: '-webkit-box',
@@ -87,7 +87,7 @@ export default function PostCard({
         
         {/* Post Content Preview */}
         <p 
-          className="text-gray-600 mb-6 leading-relaxed"
+          className="text-medium-gray mb-6 leading-relaxed"
           style={{ 
             display: '-webkit-box',
             WebkitLineClamp: 3,
@@ -106,7 +106,7 @@ export default function PostCard({
             {/* Read More Link */}
             <Link
               href={`/posts/${post.id}`}
-              className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium text-sm group/link"
+              className="inline-flex items-center gap-2 text-vivid-indigo hover:text-electric-blue font-medium text-sm group/link"
             >
               Read more
               <ArrowRight className="h-4 w-4 transition-transform group-hover/link:translate-x-1" />
@@ -115,8 +115,8 @@ export default function PostCard({
             {/* Author Avatar */}
             {post.author && (
               <div className="flex items-center space-x-2 sm:hidden">
-                <div className="w-8 h-8 bg-gradient-to-br from-primary-100 to-primary-200 rounded-full flex items-center justify-center ring-2 ring-white shadow-sm">
-                  <span className="text-primary-600 text-sm font-semibold">
+                <div className="w-8 h-8 bg-gradient-to-br from-soft-lavender to-lavender-200 rounded-full flex items-center justify-center ring-2 ring-white shadow-sm">
+                  <span className="text-vivid-indigo text-sm font-semibold">
                     {post.author.username.charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -127,12 +127,12 @@ export default function PostCard({
           {/* Desktop Author Avatar */}
           {post.author && (
             <div className="hidden sm:flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-100 to-primary-200 rounded-full flex items-center justify-center ring-2 ring-white shadow-sm">
-                <span className="text-primary-600 text-sm font-semibold">
+              <div className="w-10 h-10 bg-gradient-to-br from-soft-lavender to-lavender-200 rounded-full flex items-center justify-center ring-2 ring-white shadow-sm">
+                <span className="text-vivid-indigo text-sm font-semibold">
                   {post.author.username.charAt(0).toUpperCase()}
                 </span>
               </div>
-              <span className="text-sm text-gray-600 font-medium">
+              <span className="text-sm text-medium-gray font-medium">
                 {post.author.username}
               </span>
             </div>

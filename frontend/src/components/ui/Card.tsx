@@ -33,7 +33,7 @@ const Card: React.FC<CardProps> = ({
   interactive = false,
   onClick 
 }) => {
-  const baseClasses = 'bg-white rounded-lg shadow-soft border border-gray-200 transition-all duration-200';
+  const baseClasses = 'bg-white rounded-lg shadow-soft border border-soft-lavender transition-all duration-200';
   const hoverClasses = hover ? 'hover:shadow-medium hover:-translate-y-0.5' : '';
   const interactiveClasses = interactive ? 'cursor-pointer hover:shadow-medium hover:-translate-y-0.5 active:translate-y-0 active:shadow-soft' : '';
   
@@ -51,7 +51,7 @@ const Card: React.FC<CardProps> = ({
 
 const CardHeader: React.FC<CardHeaderProps> = ({ children, className = '' }) => {
   return (
-    <div className={cn('px-6 py-4 border-b border-gray-200', className)}>
+    <div className={cn('px-6 py-4 border-b border-soft-lavender', className)}>
       {children}
     </div>
   );
@@ -67,7 +67,7 @@ const CardBody: React.FC<CardBodyProps> = ({ children, className = '' }) => {
 
 const CardFooter: React.FC<CardFooterProps> = ({ children, className = '' }) => {
   return (
-    <div className={cn('px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-lg', className)}>
+    <div className={cn('px-6 py-4 border-t border-soft-lavender bg-warm-gray rounded-b-lg', className)}>
       {children}
     </div>
   );
