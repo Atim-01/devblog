@@ -24,6 +24,7 @@ export default function PostCard({
   isOwner = false,
   className = ''
 }: PostCardProps) {
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -36,6 +37,12 @@ export default function PostCard({
     if (content.length <= maxLength) return content;
     return content.substring(0, maxLength).trim() + '...';
   };
+
+  // Safety check - don't render if post doesn't have required data
+  if (!post || !post.id) {
+    console.error('PostCard: Post data is missing or invalid:', post);
+    return null;
+  }
 
   return (
     <Card 
@@ -61,17 +68,35 @@ export default function PostCard({
         </div>
         
         {/* Post Title */}
-        <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-primary-600 transition-colors duration-200">
+        <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors duration-200">
           <Link
             href={`/posts/${post.id}`}
-            className="hover:text-primary-600 transition-colors duration-200"
+            className="hover:text-primary-600 transition-colors duration-200 block"
           >
-            {post.title}
+            <span className="block overflow-hidden" style={{ 
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              lineHeight: '1.4',
+              maxHeight: '2.8em'
+            }}>
+              {post.title}
+            </span>
           </Link>
         </h3>
         
         {/* Post Content Preview */}
-        <p className="text-gray-600 mb-6 line-clamp-3 leading-relaxed">
+        <p 
+          className="text-gray-600 mb-6 leading-relaxed"
+          style={{ 
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            lineHeight: '1.5',
+            maxHeight: '4.5em'
+          }}
+        >
           {truncateContent(post.content)}
         </p>
         

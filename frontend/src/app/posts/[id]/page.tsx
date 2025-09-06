@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { postsApi, Post, ApiError, handleApiError } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import PostView from '@/components/blog/PostView';
+import { ConfirmationModal } from '@/components/ui/Modal';
+import { useToastNotifications } from '@/components/ui/Toast';
 
 interface PostPageProps {
   params: {
@@ -19,9 +21,11 @@ export default function PostPage({ params }: PostPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   
   const { isAuthenticated, user } = useAuth();
   const router = useRouter();
+  const { success, error: showError } = useToastNotifications();
 
   const isOwner = post?.authorId === user?.id;
   
@@ -55,21 +59,30 @@ export default function PostPage({ params }: PostPageProps) {
     fetchPost();
   }, [id]);
 
-  const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
-      return;
-    }
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
 
+  const handleDeleteConfirm = async () => {
     try {
       setIsDeleting(true);
       await postsApi.delete(id);
-      router.push('/');
+      success('Post deleted successfully', 'The post has been permanently removed.');
+      setShowDeleteModal(false);
+      // Redirect to all posts page after a short delay
+      setTimeout(() => {
+        router.push('/');
+      }, 1500);
     } catch (err) {
       console.error('Failed to delete post:', err);
-      alert('Failed to delete post. Please try again.');
+      showError('Failed to delete post', handleApiError(err));
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
   };
 
   // Loading state
@@ -151,7 +164,7 @@ export default function PostPage({ params }: PostPageProps) {
                   Edit
                 </Link>
                 <button
-                  onClick={handleDelete}
+                  onClick={handleDeleteClick}
                   disabled={isDeleting}
                   className="px-4 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -172,6 +185,19 @@ export default function PostPage({ params }: PostPageProps) {
           showBackButton={false}
         />
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Post"
+        message="Are you sure you want to delete this post? This action cannot be undone and the post will be permanently removed."
+        confirmText="Delete Post"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }
