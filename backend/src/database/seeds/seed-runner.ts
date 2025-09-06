@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
-import { User } from '../entities/user.entity';
-import { Post } from '../entities/post.entity';
+import { User } from '../../entities/user.entity';
+import { Post } from '../../entities/post.entity';
 import { usersSeedData } from './users.seed';
 import { postsSeedData } from './posts.seed';
 import { SeedUser, SeedPost } from './seed-data.interface';

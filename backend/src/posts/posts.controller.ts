@@ -78,23 +78,6 @@ export class PostsController {
     };
   }
 
-  // Get posts by specific author (public route) - MUST be before @Get(':id') to avoid route conflicts
-  @Get('author/:authorId')
-  @ApiOperation({ 
-    summary: 'Get posts by author',
-    description: 'Retrieves all blog posts created by a specific author. This is a public endpoint that shows all posts from a particular user.'
-  })
-  @ApiParam({ name: 'authorId', description: 'The unique identifier of the author', example: '123e4567-e89b-12d3-a456-426614174000' })
-  @ApiOkResponse({ description: 'Posts by specific author', schema: { example: { message: 'Posts by author retrieved successfully', data: [] } } })
-  async findByAuthor(@Param('authorId') authorId: string) {
-    const posts = await this.postsService.findByAuthor(authorId);
-    
-    return {
-      message: 'Posts by author retrieved successfully',
-      data: posts,
-    };
-  }
-
   @Get(':id')
   @ApiOperation({ 
     summary: 'Get a single blog post',
@@ -169,23 +152,6 @@ export class PostsController {
     
     return {
       message: 'Post deleted successfully',
-    };
-  }
-
-  // Get posts by specific author (public route) - MUST be before @Get(':id') to avoid route conflicts
-  @Get('author/:authorId')
-  @ApiOperation({ 
-    summary: 'Get posts by author',
-    description: 'Retrieves all blog posts created by a specific author. This is a public endpoint that shows all posts from a particular user.'
-  })
-  @ApiParam({ name: 'authorId', description: 'The unique identifier of the author', example: '123e4567-e89b-12d3-a456-426614174000' })
-  @ApiOkResponse({ description: 'Posts by specific author', schema: { example: { message: 'Posts by author retrieved successfully', data: [] } } })
-  async findByAuthor(@Param('authorId') authorId: string) {
-    const posts = await this.postsService.findByAuthor(authorId);
-    
-    return {
-      message: 'Posts by author retrieved successfully',
-      data: posts,
     };
   }
 }

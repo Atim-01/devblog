@@ -1,0 +1,39 @@
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
+
+# Application Configuration
+NEXT_PUBLIC_APP_NAME=Dev-Blog
+NEXT_PUBLIC_APP_DESCRIPTION=A modern blog platform for developers
+
+# Authentication Configuration
+NEXT_PUBLIC_JWT_STORAGE_KEY=authToken
+NEXT_PUBLIC_AUTH_REDIRECT_URL=/login
+
+# Feature Flags (Optional)
+NEXT_PUBLIC_ENABLE_ANALYTICS=false
+NEXT_PUBLIC_ENABLE_COMMENTS=false
+NEXT_PUBLIC_ENABLE_LIKES=false
+
+# Social Media Links (Optional)
+NEXT_PUBLIC_TWITTER_URL=
+NEXT_PUBLIC_GITHUB_URL=
+NEXT_PUBLIC_LINKEDIN_URL=
+
+# SEO Configuration
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_NAME=Dev-Blog
+NEXT_PUBLIC_SITE_DESCRIPTION=A modern blog platform for developers to share knowledge and experiences
+
+# Analytics (Optional)
+NEXT_PUBLIC_GOOGLE_ANALYTICS_ID=
+NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID=
+
+# Error Tracking (Optional)
+NEXT_PUBLIC_SENTRY_DSN=
+
+# Image Optimization (Optional)
+NEXT_PUBLIC_IMAGE_DOMAINS=localhost
+
+# Development Configuration
+NEXT_PUBLIC_DEBUG=false
+NEXT_PUBLIC_LOG_LEVEL=info

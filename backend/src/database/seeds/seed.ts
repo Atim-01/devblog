@@ -1,12 +1,13 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../app.module';
+import { AppModule } from '../../app.module';
 import { SeedRunner } from './seed-runner';
+import { DataSource } from 'typeorm';
 
 async function bootstrap() {
   console.log('🚀 Starting seed script...');
   
   const app = await NestFactory.createApplicationContext(AppModule);
-  const dataSource = app.get('DataSource');
+  const dataSource = app.get(DataSource);
   
   const seedRunner = new SeedRunner(dataSource);
   
