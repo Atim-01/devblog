@@ -40,7 +40,11 @@ export default function Footer() {
               </li>
               {isAuthenticated && user && (
                 <>
-                  
+                  <li>
+                    <Link href="/my-posts" className="text-gray-600 hover:text-primary-600 transition-colors">
+                      My Posts
+                    </Link>
+                  </li>
                   <li>
                     <Link href="/create-post" className="text-gray-600 hover:text-primary-600 transition-colors">
                       Create Post
