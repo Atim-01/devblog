@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Post, postsApi, ApiError, handleApiError } from '@/lib/api';
 import PostList from '@/components/blog/PostList';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,6 +22,7 @@ export default function PostsPageClient({ initialPosts, initialError }: PostsPag
   const [isSearching, setIsSearching] = useState(false);
   
   const { isAuthenticated, user } = useAuth();
+  const router = useRouter();
 
   const handleSearch = async (query: string) => {
     if (!query.trim()) {
@@ -145,7 +147,7 @@ export default function PostsPageClient({ initialPosts, initialError }: PostsPag
                   <h3 className="text-sm font-medium text-red-800">Failed to load posts</h3>
                   <p className="mt-2 text-sm text-red-700">{error}</p>
                   <button
-                    onClick={() => window.location.reload()}
+                    onClick={() => router.refresh()}
                     className="mt-3 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                   >
                     Try again

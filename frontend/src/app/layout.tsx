@@ -13,7 +13,11 @@ export const metadata: Metadata = {
   description: 'A platform for developers to share their knowledge and experiences through blog posts.',
   keywords: ['blog', 'development', 'programming', 'tech', 'knowledge sharing'],
   authors: [{ name: 'Dev-Blog Team' }],
-  viewport: 'width=device-width, initial-scale=1',
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({

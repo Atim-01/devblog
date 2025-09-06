@@ -225,7 +225,7 @@ export default function MyPostsPage() {
                   <h3 className="text-sm font-medium text-red-800">Failed to load your posts</h3>
                   <p className="mt-2 text-sm text-red-700">{error}</p>
                   <button
-                    onClick={() => window.location.reload()}
+                    onClick={() => router.refresh()}
                     className="mt-3 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                   >
                     Try again

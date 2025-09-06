@@ -7,8 +7,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Card, CardHeader, CardBody, CardFooter } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 
 const loginSchema = z.object({
@@ -79,7 +79,6 @@ export default function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProp
           
           <Input
             label="Username"
-            name="username"
             placeholder="Enter your username"
             error={errors.username?.message}
             required
@@ -88,7 +87,6 @@ export default function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProp
           
           <Input
             label="Password"
-            name="password"
             type="password"
             placeholder="Enter your password"
             error={errors.password?.message}

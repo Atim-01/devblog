@@ -21,12 +21,30 @@ export default function EditPostPage({ params }: EditPostPageProps) {
   const [submitError, setSubmitError] = useState('');
   const [fetchError, setFetchError] = useState<string | null>(null);
   
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
-  // Redirect if not authenticated
+  // Redirect if not authenticated (use useEffect to avoid SSR issues)
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-warm-gray to-soft-lavender flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-vivid-indigo mx-auto"></div>
+          <p className="mt-4 text-medium-gray">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render anything if not authenticated (will redirect)
   if (!isAuthenticated) {
-    router.push('/login');
     return null;
   }
 
@@ -88,13 +106,13 @@ export default function EditPostPage({ params }: EditPostPageProps) {
   // Loading state
   if (isLoadingPost) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-warm-gray to-soft-lavender flex items-center justify-center">
         <div className="text-center">
-          <svg className="animate-spin mx-auto h-12 w-12 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin mx-auto h-12 w-12 text-vivid-indigo" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          <p className="mt-4 text-gray-600">Loading post...</p>
+          <p className="mt-4 text-medium-gray">Loading post...</p>
         </div>
       </div>
     );
@@ -103,7 +121,7 @@ export default function EditPostPage({ params }: EditPostPageProps) {
   // Error state
   if (fetchError) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-warm-gray to-soft-lavender flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
           <div className="bg-red-50 border border-red-200 rounded-md p-6">
             <div className="flex">
@@ -117,14 +135,14 @@ export default function EditPostPage({ params }: EditPostPageProps) {
                 <p className="mt-2 text-sm text-red-700">{fetchError}</p>
                 <div className="mt-4 flex space-x-3">
                   <button
-                    onClick={() => window.location.reload()}
+                    onClick={() => router.refresh()}
                     className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                   >
                     Try again
                   </button>
                   <Link
                     href="/"
-                    className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-dark-charcoal bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                   >
                     Back to posts
                   </Link>
@@ -142,25 +160,25 @@ export default function EditPostPage({ params }: EditPostPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-warm-gray to-soft-lavender">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between">
             <Link
               href={`/posts/${id}`}
-              className="text-primary-600 hover:text-primary-700 font-medium"
+              className="text-vivid-indigo hover:text-electric-blue font-medium"
             >
               ← Back to post
             </Link>
             
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-primary-600 text-sm font-medium">
+              <div className="w-8 h-8 bg-soft-lavender rounded-full flex items-center justify-center">
+                <span className="text-vivid-indigo text-sm font-medium">
                   {user?.username.charAt(0).toUpperCase()}
                 </span>
               </div>
-              <span className="text-sm text-gray-700">
+              <span className="text-sm text-dark-charcoal">
                 {user?.username}
               </span>
             </div>
@@ -172,16 +190,16 @@ export default function EditPostPage({ params }: EditPostPageProps) {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="p-8 border-b border-gray-200">
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-dark-charcoal">
               Edit Post
             </h1>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-medium-gray">
               Make changes to your blog post
             </p>
           </div>
 
           <div className="p-8">
-            <PostForm
+            <PostForm<UpdatePostData>
               mode="edit"
               initialData={originalPost}
               onSubmit={handleSubmit}

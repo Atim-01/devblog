@@ -46,7 +46,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       
       // Check if user is logged in by verifying JWT token
-      const token = localStorage.getItem('authToken');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
       console.log('Auth check - token exists:', !!token);
       
       if (!token) {
@@ -66,7 +66,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (error instanceof ApiError && error.status === 401) {
           // Token expired or invalid
           console.log('Token expired or invalid, clearing auth data');
-          localStorage.removeItem('authToken');
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('authToken');
+          }
           setUser(null);
         } else {
           console.error('Auth check failed:', error);
@@ -82,20 +84,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 updatedAt: new Date().toISOString(),
               });
             } else {
-              console.log('Token expired locally');
+            console.log('Token expired locally');
+            if (typeof window !== 'undefined') {
               localStorage.removeItem('authToken');
-              setUser(null);
+            }
+            setUser(null);
             }
           } catch (localError) {
             console.error('Local token decode failed:', localError);
-            localStorage.removeItem('authToken');
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('authToken');
+            }
             setUser(null);
           }
         }
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      localStorage.removeItem('authToken');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('authToken');
+      }
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -137,7 +145,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Logout failed:', error);
       // Continue with local cleanup even if API call fails
     } finally {
-      localStorage.removeItem('authToken');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('authToken');
+      }
       setUser(null);
     }
   };

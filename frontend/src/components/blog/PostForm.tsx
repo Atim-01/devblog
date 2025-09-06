@@ -3,23 +3,23 @@
 import { useState, useEffect } from 'react';
 import { CreatePostData, UpdatePostData, Post } from '@/lib/api';
 
-interface PostFormProps {
+interface PostFormProps<T = CreatePostData> {
   mode: 'create' | 'edit';
   initialData?: Post;
-  onSubmit: (data: CreatePostData | UpdatePostData) => Promise<void>;
+  onSubmit: (data: T) => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
   submitError?: string;
 }
 
-export default function PostForm({
+export default function PostForm<T = CreatePostData>({
   mode,
   initialData,
   onSubmit,
   onCancel,
   isLoading = false,
   submitError = ''
-}: PostFormProps) {
+}: PostFormProps<T>) {
   const [formData, setFormData] = useState<CreatePostData>({
     title: '',
     content: '',
@@ -64,7 +64,21 @@ export default function PostForm({
       return;
     }
 
-    await onSubmit(formData);
+    // For create mode, we pass the full formData
+    // For edit mode, we pass only the changed fields
+    if (mode === 'create') {
+      await onSubmit(formData as T);
+    } else {
+      // In edit mode, only pass fields that have changed
+      const updateData: UpdatePostData = {};
+      if (initialData && formData.title !== initialData.title) {
+        updateData.title = formData.title;
+      }
+      if (initialData && formData.content !== initialData.content) {
+        updateData.content = formData.content;
+      }
+      await onSubmit(updateData as T);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -99,15 +113,15 @@ export default function PostForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Error Display */}
       {submitError && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+        <div className="p-4 bg-crimson-red/10 border border-crimson-red/20 rounded-md">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5 text-crimson-red" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm text-red-800">{submitError}</p>
+              <p className="text-sm text-error-800">{submitError}</p>
             </div>
           </div>
         </div>
@@ -115,7 +129,7 @@ export default function PostForm({
 
       {/* Title Field */}
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="title" className="block text-sm font-medium text-dark-charcoal mb-2">
           Post Title
         </label>
         <input
@@ -125,22 +139,22 @@ export default function PostForm({
           required
           value={formData.title}
           onChange={handleInputChange}
-          className={`block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
-            errors.title ? 'border-red-300' : 'border-gray-300'
+          className={`block w-full px-3 py-2 border rounded-md shadow-sm placeholder-medium-gray focus:outline-none focus:ring-vivid-indigo focus:border-vivid-indigo sm:text-sm ${
+            errors.title ? 'border-crimson-red' : 'border-medium-gray'
           }`}
           placeholder="Enter your post title"
         />
         {errors.title && (
-          <p className="mt-1 text-sm text-red-600">{errors.title}</p>
+          <p className="mt-1 text-sm text-error-600">{errors.title}</p>
         )}
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-medium-gray">
           {formData.title.length}/100 characters
         </p>
       </div>
 
       {/* Content Field */}
       <div>
-        <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="content" className="block text-sm font-medium text-dark-charcoal mb-2">
           Post Content
         </label>
         <textarea
@@ -150,32 +164,32 @@ export default function PostForm({
           required
           value={formData.content}
           onChange={handleInputChange}
-          className={`block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm resize-vertical ${
-            errors.content ? 'border-red-300' : 'border-gray-300'
+          className={`block w-full px-3 py-2 border rounded-md shadow-sm placeholder-medium-gray focus:outline-none focus:ring-vivid-indigo focus:border-vivid-indigo sm:text-sm resize-vertical ${
+            errors.content ? 'border-crimson-red' : 'border-medium-gray'
           }`}
           placeholder="Write your post content here. You can use markdown formatting for better structure."
         />
         {errors.content && (
-          <p className="mt-1 text-sm text-red-600">{errors.content}</p>
+          <p className="mt-1 text-sm text-error-600">{errors.content}</p>
         )}
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-medium-gray">
           {formData.content.length} characters (minimum 50)
         </p>
       </div>
 
       {/* Writing Tips */}
-      <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+      <div className="bg-teal/10 border border-teal/20 rounded-md p-4">
         <div className="flex">
           <div className="flex-shrink-0">
-            <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+            <svg className="h-5 w-5 text-teal" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
             </svg>
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-blue-800">
+            <h3 className="text-sm font-medium text-accent-800">
               {mode === 'create' ? 'Writing Tips' : 'Editing Tips'}
             </h3>
-            <div className="mt-2 text-sm text-blue-700">
+            <div className="mt-2 text-sm text-accent-700">
               <ul className="list-disc list-inside space-y-1">
                 {mode === 'create' ? (
                   <>
@@ -204,7 +218,7 @@ export default function PostForm({
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="px-4 py-2 border border-medium-gray rounded-md text-sm font-medium text-dark-charcoal hover:bg-soft-lavender"
           >
             Cancel
           </button>
@@ -213,7 +227,7 @@ export default function PostForm({
             <button
               type="button"
               onClick={resetForm}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-medium-gray rounded-md text-sm font-medium text-dark-charcoal hover:bg-soft-lavender"
             >
               Reset
             </button>
@@ -223,7 +237,7 @@ export default function PostForm({
         <button
           type="submit"
           disabled={isLoading || (mode === 'edit' && !hasChanges())}
-          className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-vivid-indigo hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-vivid-indigo disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <div className="flex items-center">

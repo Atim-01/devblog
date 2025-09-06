@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Post } from '@/lib/server-api';
 import PostList from '@/components/blog/PostList';
 import { useAuth } from '@/hooks/useAuth';
@@ -12,6 +13,7 @@ interface HomePageClientProps {
 
 export default function HomePageClient({ posts, error }: HomePageClientProps) {
   const { isAuthenticated, user, isLoading: authLoading } = useAuth();
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-warm-gray to-soft-lavender">
@@ -107,7 +109,7 @@ export default function HomePageClient({ posts, error }: HomePageClientProps) {
                   <h3 className="text-sm font-medium text-error-800">Failed to load posts</h3>
                   <p className="mt-2 text-sm text-error-700">{error}</p>
                   <button
-                    onClick={() => window.location.reload()}
+                    onClick={() => router.refresh()}
                     className="mt-3 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-error-700 bg-crimson-red/20 hover:bg-crimson-red/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-crimson-red"
                   >
                     Try again

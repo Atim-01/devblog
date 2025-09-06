@@ -7,7 +7,7 @@ const getHeaders = (includeAuth = false) => {
     'Content-Type': 'application/json',
   };
 
-  if (includeAuth) {
+  if (includeAuth && typeof window !== 'undefined') {
     const token = localStorage.getItem('authToken');
     if (token) {
       headers.Authorization = `Bearer ${token}`;
