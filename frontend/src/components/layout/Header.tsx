@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
 import Button from '@/components/ui/Button';
-import { Menu, X, Home, Plus, LogOut, User } from 'lucide-react';
+import { Menu, X, Home, Plus, LogOut, User, FileText, BookOpen } from 'lucide-react';
 import { cn } from '@/utils';
 
 export default function Header() {
@@ -14,8 +14,6 @@ export default function Header() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Debug logging
-  console.log('Header render - isAuthenticated:', isAuthenticated, 'user:', user, 'isLoading:', isLoading);
 
   const handleLogout = async () => {
     try {
@@ -58,14 +56,30 @@ export default function Header() {
               <Home className="h-4 w-4" />
               Home
             </Link>
+            <Link
+              href="/posts"
+              className="flex items-center gap-2 text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+            >
+              <BookOpen className="h-4 w-4" />
+              All Posts
+            </Link>
             {isAuthenticated && (
-              <Link
-                href="/create-post"
-                className="flex items-center gap-2 text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-              >
-                <Plus className="h-4 w-4" />
-                Create Post
-              </Link>
+              <>
+                <Link
+                  href="/my-posts"
+                  className="flex items-center gap-2 text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                >
+                  <FileText className="h-4 w-4" />
+                  My Posts
+                </Link>
+                <Link
+                  href="/create-post"
+                  className="flex items-center gap-2 text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                >
+                  <Plus className="h-4 w-4" />
+                  Create Post
+                </Link>
+              </>
             )}
           </nav>
 
@@ -142,16 +156,34 @@ export default function Header() {
               <Home className="h-5 w-5" />
               Home
             </Link>
+            <Link
+              href="/posts"
+              className="flex items-center gap-3 text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <BookOpen className="h-5 w-5" />
+              All Posts
+            </Link>
             
             {isAuthenticated && (
-              <Link
-                href="/create-post"
-                className="flex items-center gap-3 text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Plus className="h-5 w-5" />
-                Create Post
-              </Link>
+              <>
+                <Link
+                  href="/my-posts"
+                  className="flex items-center gap-3 text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <FileText className="h-5 w-5" />
+                  My Posts
+                </Link>
+                <Link
+                  href="/create-post"
+                  className="flex items-center gap-3 text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Plus className="h-5 w-5" />
+                  Create Post
+                </Link>
+              </>
             )}
 
             {isLoading ? (

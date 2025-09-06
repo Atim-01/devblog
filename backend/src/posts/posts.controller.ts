@@ -78,6 +78,22 @@ export class PostsController {
     };
   }
 
+  @Get('author/:authorId')
+  @ApiOperation({ 
+    summary: 'Get posts by author',
+    description: 'Retrieves all blog posts created by a specific author. This is a public endpoint that returns posts with author information.'
+  })
+  @ApiParam({ name: 'authorId', description: 'The unique identifier of the author', example: '123e4567-e89b-12d3-a456-426614174000' })
+  @ApiOkResponse({ description: 'Posts by author', schema: { example: { message: 'Posts by author retrieved successfully', data: [] } } })
+  async getPostsByAuthor(@Param('authorId') authorId: string) {
+    const posts = await this.postsService.findByAuthor(authorId);
+    
+    return {
+      message: 'Posts by author retrieved successfully',
+      data: posts,
+    };
+  }
+
   @Get(':id')
   @ApiOperation({ 
     summary: 'Get a single blog post',

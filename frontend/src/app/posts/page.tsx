@@ -1,8 +1,8 @@
 import { Post, serverPostsApi, handleServerApiError } from '@/lib/server-api';
-import HomePageClient from './HomePageClient';
+import PostsPageClient from './PostsPageClient';
 
 // Server Component - data fetching happens on the server
-export default async function HomePage() {
+export default async function PostsPage() {
   let posts: Post[] = [];
   let error: string | undefined;
 
@@ -13,5 +13,5 @@ export default async function HomePage() {
     error = handleServerApiError(err);
   }
 
-  return <HomePageClient posts={posts} error={error} />;
+  return <PostsPageClient initialPosts={posts} initialError={error} />;
 }
