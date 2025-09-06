@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const { isAuthenticated, user } = useAuth();
   
   return (
     <footer className="bg-white border-t border-gray-200 mt-auto">
@@ -36,30 +38,45 @@ export default function Footer() {
                   All Posts
                 </Link>
               </li>
-              <li>
-                <Link href="/create-post" className="text-gray-600 hover:text-primary-600 transition-colors">
-                  Create Post
-                </Link>
-              </li>
+              {isAuthenticated && user && (
+                <>
+                  
+                  <li>
+                    <Link href="/create-post" className="text-gray-600 hover:text-primary-600 transition-colors">
+                      Create Post
+                    </Link>
+                  </li>
+                </>
+              )
+            }
             </ul>
           </div>
           
           {/* Account */}
           <div>
             <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
-              Account
+             
             </h3>
             <ul className="space-y-3">
-              <li>
-                <Link href="/login" className="text-gray-600 hover:text-primary-600 transition-colors">
-                  Login
-                </Link>
-              </li>
-              <li>
-                <Link href="/register" className="text-gray-600 hover:text-primary-600 transition-colors">
-                  Register
-                </Link>
-              </li>
+              {isAuthenticated && user ? (
+                <>
+                  
+                 
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link href="/login" className="text-gray-600 hover:text-primary-600 transition-colors">
+                      Login
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/register" className="text-gray-600 hover:text-primary-600 transition-colors">
+                      Register
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
         </div>

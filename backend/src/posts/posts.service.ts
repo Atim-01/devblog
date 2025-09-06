@@ -44,6 +44,7 @@ export class PostsService {
         id: true,
         title: true,
         content: true,
+        authorId: true,
         createdAt: true,
         updatedAt: true,
         author: {
@@ -65,6 +66,7 @@ export class PostsService {
         id: true,
         title: true,
         content: true,
+        authorId: true,
         createdAt: true,
         updatedAt: true,
         author: {
@@ -89,6 +91,7 @@ export class PostsService {
         id: true,
         title: true,
         content: true,
+        authorId: true,
         createdAt: true,
         updatedAt: true,
         author: {

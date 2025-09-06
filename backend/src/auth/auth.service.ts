@@ -14,7 +14,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<{ user: Partial<User>; token: string }> {
+  async register(registerDto: RegisterDto): Promise<{ user: Partial<User>; accessToken: string }> {
     const { username, password } = registerDto;
 
     // Check if user already exists
@@ -40,10 +40,10 @@ export class AuthService {
 
     // Return user data (without password) and token
     const { password: _, ...userWithoutPassword } = savedUser;
-    return { user: userWithoutPassword, token };
+    return { user: userWithoutPassword, accessToken: token };
   }
 
-  async login(loginDto: LoginDto): Promise<{ user: Partial<User>; token: string }> {
+  async login(loginDto: LoginDto): Promise<{ user: Partial<User>; accessToken: string }> {
     const { username, password } = loginDto;
 
     // Find user by username
@@ -66,7 +66,7 @@ export class AuthService {
 
     // Return user data (without password) and token
     const { password: _, ...userWithoutPassword } = user;
-    return { user: userWithoutPassword, token };
+    return { user: userWithoutPassword, accessToken: token };
   }
 
   async validateUser(id: string): Promise<User> {

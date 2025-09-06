@@ -10,9 +10,12 @@ import { cn } from '@/utils';
 
 export default function Header() {
   const router = useRouter();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, logout, isLoading } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Debug logging
+  console.log('Header render - isAuthenticated:', isAuthenticated, 'user:', user, 'isLoading:', isLoading);
 
   const handleLogout = async () => {
     try {
@@ -68,7 +71,9 @@ export default function Header() {
 
           {/* Desktop Auth Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            {isAuthenticated && user ? (
+            {isLoading ? (
+              <div className="text-sm text-gray-500">Loading...</div>
+            ) : isAuthenticated && user ? (
               <>
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-gradient-to-br from-primary-100 to-primary-200 rounded-full flex items-center justify-center ring-2 ring-white shadow-sm">
@@ -149,7 +154,11 @@ export default function Header() {
               </Link>
             )}
 
-            {isAuthenticated && user ? (
+            {isLoading ? (
+              <div className="border-t border-gray-200 pt-3 mt-3">
+                <div className="text-center text-sm text-gray-500 px-3 py-2">Loading...</div>
+              </div>
+            ) : isAuthenticated && user ? (
               <div className="border-t border-gray-200 pt-3 mt-3">
                 <div className="flex items-center space-x-3 px-3 py-2">
                   <div className="w-10 h-10 bg-gradient-to-br from-primary-100 to-primary-200 rounded-full flex items-center justify-center ring-2 ring-white shadow-sm">

@@ -9,9 +9,7 @@ import { z } from 'zod';
 import { Card, CardHeader, CardBody, CardFooter } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { RegisterData } from '@/types';
-import { apiPost } from '@/lib/api';
-import { setAuthToken, setUser } from '@/utils';
+import { useAuth } from '@/hooks/useAuth';
 
 const registerSchema = z.object({
   username: z
@@ -41,7 +39,7 @@ interface RegisterFormProps {
 
 export default function RegisterForm({ onSuccess, redirectTo = '/' }: RegisterFormProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const { register: registerUser, isLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
   
   const {
@@ -53,37 +51,24 @@ export default function RegisterForm({ onSuccess, redirectTo = '/' }: RegisterFo
   });
   
   const onSubmit = async (data: RegisterFormData) => {
-    setIsLoading(true);
     setError(null);
     
     try {
-      const response = await apiPost<{ user: any; token: string }>('/auth/register', {
-        username: data.username,
-        password: data.password,
-      });
+      await registerUser(data.username, data.password);
       
-      if (response.success) {
-        // Store auth data
-        setAuthToken(response.data.token);
-        setUser(response.data.user);
-        
-        // Call success callback if provided
-        if (onSuccess) {
-          onSuccess();
-        }
-        
-        // Redirect
-        router.push(redirectTo);
+      // Call success callback if provided
+      if (onSuccess) {
+        onSuccess();
       }
+      
+      // Redirect
+      router.push(redirectTo);
     } catch (err: any) {
       console.error('Registration error:', err);
       setError(
-        err.response?.data?.message || 
         err.message || 
         'An error occurred during registration. Please try again.'
       );
-    } finally {
-      setIsLoading(false);
     }
   };
   

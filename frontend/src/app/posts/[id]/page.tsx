@@ -24,6 +24,14 @@ export default function PostPage({ params }: PostPageProps) {
   const router = useRouter();
 
   const isOwner = post?.authorId === user?.id;
+  
+  // Debug logging
+  console.log('Post data:', post);
+  console.log('User data:', user);
+  console.log('Post authorId:', post?.authorId);
+  console.log('User id:', user?.id);
+  console.log('Is owner:', isOwner);
+  console.log('Is authenticated:', isAuthenticated);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -160,6 +168,7 @@ export default function PostPage({ params }: PostPageProps) {
         <PostView 
           post={post}
           showActions={false}
+          isOwner={isOwner}
           showBackButton={false}
         />
       </div>

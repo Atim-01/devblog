@@ -47,23 +47,50 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Check if user is logged in by verifying JWT token
       const token = localStorage.getItem('authToken');
+      console.log('Auth check - token exists:', !!token);
+      
       if (!token) {
+        console.log('No token found, setting user to null');
         setUser(null);
         return;
       }
 
       // Verify token with backend API
       try {
+        console.log('Verifying token with backend...');
         const userData = await authApi.getProfile();
+        console.log('User data received:', userData);
         setUser(userData);
       } catch (error) {
+        console.error('Auth check failed with error:', error);
         if (error instanceof ApiError && error.status === 401) {
           // Token expired or invalid
+          console.log('Token expired or invalid, clearing auth data');
           localStorage.removeItem('authToken');
           setUser(null);
         } else {
           console.error('Auth check failed:', error);
-          setUser(null);
+          // If backend is not available, try to decode the token locally as fallback
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            if (payload.exp && payload.exp * 1000 > Date.now()) {
+              console.log('Using local token fallback');
+              setUser({
+                id: payload.sub,
+                username: payload.username,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              });
+            } else {
+              console.log('Token expired locally');
+              localStorage.removeItem('authToken');
+              setUser(null);
+            }
+          } catch (localError) {
+            console.error('Local token decode failed:', localError);
+            localStorage.removeItem('authToken');
+            setUser(null);
+          }
         }
       }
     } catch (error) {

@@ -9,9 +9,7 @@ import { z } from 'zod';
 import { Card, CardHeader, CardBody, CardFooter } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { LoginData } from '@/types';
-import { apiPost } from '@/lib/api';
-import { setAuthToken, setUser } from '@/utils';
+import { useAuth } from '@/hooks/useAuth';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -27,7 +25,7 @@ interface LoginFormProps {
 
 export default function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, isLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
   
   const {
@@ -39,34 +37,24 @@ export default function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProp
   });
   
   const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true);
     setError(null);
     
     try {
-      const response = await apiPost<{ user: any; token: string }>('/auth/login', data);
+      await login(data.username, data.password);
       
-      if (response.success) {
-        // Store auth data
-        setAuthToken(response.data.token);
-        setUser(response.data.user);
-        
-        // Call success callback if provided
-        if (onSuccess) {
-          onSuccess();
-        }
-        
-        // Redirect
-        router.push(redirectTo);
+      // Call success callback if provided
+      if (onSuccess) {
+        onSuccess();
       }
+      
+      // Redirect
+      router.push(redirectTo);
     } catch (err: any) {
       console.error('Login error:', err);
       setError(
-        err.response?.data?.message || 
         err.message || 
         'An error occurred during login. Please try again.'
       );
-    } finally {
-      setIsLoading(false);
     }
   };
   

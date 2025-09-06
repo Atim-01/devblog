@@ -1,8 +1,10 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { ApiBody, ApiOkResponse, ApiCreatedResponse, ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiCreatedResponse, ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -40,6 +42,26 @@ export class AuthController {
     return {
       message: 'Login successful',
       data: result,
+    };
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ 
+    summary: 'Get current user profile',
+    description: 'Returns the profile information of the currently authenticated user. Requires a valid JWT token in the Authorization header.'
+  })
+  @ApiOkResponse({ description: 'Current user profile', schema: { example: { message: 'User profile retrieved successfully', data: { id: 'uuid', username: 'johndoe', createdAt: '2025-09-04T02:00:00.000Z', updatedAt: '2025-09-04T02:00:00.000Z' } } } })
+  async getCurrentUser(@CurrentUser() user: any) {
+    return {
+      message: 'User profile retrieved successfully',
+      data: {
+        id: user.id,
+        username: user.username,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
     };
   }
 }

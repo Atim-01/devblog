@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Post } from '@/lib/api';
+import { useAuth } from '@/hooks/useAuth';
 
 interface PostViewProps {
   post: Post;
@@ -20,6 +21,7 @@ export default function PostView({
   showBackButton = true,
   backUrl = '/'
 }: PostViewProps) {
+  const { isAuthenticated, user } = useAuth();
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -113,29 +115,31 @@ export default function PostView({
         </div>
       )}
 
-      {/* Call to Action */}
-      <div className="bg-white rounded-lg shadow-md p-8 text-center">
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">
-          Ready to share your knowledge?
-        </h3>
-        <p className="text-gray-600 mb-6">
-          Join our community and start writing blog posts today.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            href="/create-post"
-            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
-          >
-            Write a Post
-          </Link>
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            Browse More Posts
-          </Link>
+      {/* Call to Action - Only show when user is NOT logged in */}
+      {!isAuthenticated && (
+        <div className="bg-white rounded-lg shadow-md p-8 text-center">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            Ready to share your knowledge?
+          </h3>
+          <p className="text-gray-600 mb-6">
+            Join our community and start writing blog posts today.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/create-post"
+              className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
+            >
+              Write a Post
+            </Link>
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            >
+              Browse More Posts
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

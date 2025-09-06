@@ -4,11 +4,13 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { postsApi, Post, ApiError, handleApiError } from '@/lib/api';
 import PostList from '@/components/blog/PostList';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function HomePage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -34,31 +36,65 @@ export default function HomePage() {
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
-              Welcome to{' '}
-              <span className="text-primary-600">Dev-Blog</span>
-            </h1>
-            <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-              A platform for developers to share knowledge, experiences, and insights through blog posts.
-            </p>
-            <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-              <div className="rounded-md shadow">
-                <Link
-                  href="/create-post"
-                  className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 md:py-4 md:text-lg md:px-10"
-                >
-                  Write a Post
-                </Link>
-              </div>
-              <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-                <Link
-                  href="/login"
-                  className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10"
-                >
-                  Sign In
-                </Link>
-              </div>
-            </div>
+            {authLoading ? (
+              <div className="text-lg text-gray-500">Loading...</div>
+            ) : isAuthenticated && user ? (
+              <>
+                <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
+                  Welcome back,{' '}
+                  <span className="text-primary-600">{user.username}</span>
+                </h1>
+                <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                  Ready to share your knowledge or explore the latest posts from the community?
+                </p>
+                <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+                  <div className="rounded-md shadow">
+                    <Link
+                      href="/create-post"
+                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 hover:text-white md:py-4 md:text-lg md:px-10"
+                    >
+                      Write a Post
+                    </Link>
+                  </div>
+                  <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
+                    <Link
+                      href="/posts"
+                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10"
+                    >
+                      Browse Posts
+                    </Link>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
+                  Welcome to{' '}
+                  <span className="text-primary-600">Dev-Blog</span>
+                </h1>
+                <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                  A platform for developers to share knowledge, experiences, and insights through blog posts.
+                </p>
+                <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+                  <div className="rounded-md shadow">
+                    <Link
+                      href="/create-post"
+                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 hover:text-white md:py-4 md:text-lg md:px-10"
+                    >
+                      Write a Post
+                    </Link>
+                  </div>
+                  <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
+                    <Link
+                      href="/login"
+                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10"
+                    >
+                      Sign In
+                    </Link>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -121,32 +157,36 @@ export default function HomePage() {
           />
         )}
 
-        {/* Call to Action */}
-        <div className="mt-16 text-center">
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              Ready to share your knowledge?
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Join our community of developers and start writing blog posts today.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/register"
-                className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
-              >
-                Get Started
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
-                Sign In
-              </Link>
+        {/* My Posts Section - Only show when authenticated */}
+        {isAuthenticated && user && !authLoading && (
+          <div className="mt-16">
+            <div className="bg-white rounded-lg shadow-md p-8 text-center">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              My Blog Dashboard
+              </h3>
+              <p className="text-gray-600 mb-6">
+                View and manage all your blog posts.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="/create-post"
+                  className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 hover:text-white"
+                >
+                  Write a New Post
+                </Link>
+                <Link
+                  href="/posts"
+                  className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  Browse All My Posts
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+        
       </div>
+      
     </div>
   );
 }
